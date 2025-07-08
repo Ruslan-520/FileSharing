@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: ./app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/uploads:/app/uploads
+    environment:
+      - DATABASE_URL=postgresql://postgres:12345@db/filesharing
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: filesharing
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
